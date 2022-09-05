@@ -62,14 +62,12 @@ class _BlueprintAppState extends State<BlueprintApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text('Blueprint')),
-        body: Center(
-          child: FolderPicker(
-            onFolderSelected: (Directory directory) {
-              projectTree = loadFromDirectory(directory,
-                  filters: [isNotHidden, isFileWhilteListed]);
-              print(projectTree.children.length);
-            },
-          ),
+        floatingActionButton: FolderPicker(
+          onFolderSelected: (Directory directory) {
+            projectTree = loadFromDirectory(directory,
+                filters: [isNotHidden, isFileWhilteListed]);
+            print(projectTree.children.length);
+          },
         ),
       ),
     );
