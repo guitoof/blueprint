@@ -1,0 +1,55 @@
+name: Test
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_call:
+
+jobs:
+  test:
+    strategy:
+      matrix: {dir: ["."]}
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: ${{ matrix.dir }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - id: dotenv
+        uses: falti/dotenv-action@v0.2.8
+        with:
+          path: .github/workflows/.env
+
+      - uses: subosito/flutter-action@v2.5.0
+        with:
+          flutter-version: ${{ steps.dotenv.outputs.flutter_version }}
+          channel: "stable"
+          cache: true
+          cache-key: ${{ runner.os }}-flutter-${{ steps.dotenv.outputs.flutter_version }}
+          cache-path: ${{ runner.tool_cache }}/flutter-${{ steps.dotenv.outputs.flutter_version }}
+
+      - name: Install Dependencies
+        run: flutter packages get
+
+      - name: Format
+        run: flutter format --set-exit-if-changed lib test
+
+      - name: Analyze
+        run: flutter analyze lib test
+
+      - name: Run tests
+        run: flutter test --no-pub --coverage --test-randomize-ordering-seed random
+
+      - name: Install Remove From Coverage
+        run: dart pub global activate remove_from_coverage
+
+      - name: Remove from coverage generated files
+        run: remove_from_coverage -f coverage/lcov.info -r '\.gql\.dart$|\.g\.dart$|\.freezed\.dart$'
+
+      - name: Check Code Coverage
+        uses: VeryGoodOpenSource/very_good_coverage@v1.2.0
+        with:
+          path: "./${{ matrix.dir }}/coverage/lcov.info"
+          min_coverage: 100
