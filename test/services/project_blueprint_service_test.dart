@@ -14,11 +14,11 @@ void main() {
     });
 
     group('loadProjectTree', () {
-      /// Testing loading fixture project: project_A
-      /// file_A1_1.dart <-- file_A2_1.dart
-      group('for Project A', () {
+      /// Testing loading fixture project: project_a
+      /// file_a1_1.dart <-- file_a2_1.dart
+      group('for Project a', () {
         final directory =
-            Directory('${Directory.current.path}/test/fixtures/project_A');
+            Directory('${Directory.current.path}/test/fixtures/project_a');
 
         setUpAll(() {
           service = ProjectBlueprintService(workDirectory: directory);
@@ -30,41 +30,41 @@ void main() {
         });
 
         test(
-            "should return a project tree that verifies: if file_A import file_B, then file_B's id is contained in file_A's importingComponentIds",
+            "should return a project tree that verifies: if file_a import file_b, then file_b's id is contained in file_a's importingComponentIds",
             () {
           final projectTree = service?.loadProjectTree(directory);
           expect(
             getChildForPath(
                     projectTree: projectTree!,
-                    path: 'subfolder_A1/file_A1_1.dart')
+                    path: 'subfolder_a1/file_a1_1.dart')
                 .importingComponentIds,
             contains(getChildForPath(
                     projectTree: projectTree,
-                    path: 'subfolder_A2/file_A2_1.dart')
+                    path: 'subfolder_a2/file_a2_1.dart')
                 .id),
           );
         });
         test(
-            "should return a project tree that verifies: if file_A does not importa any file, then its importingComponentIds is be empty",
+            "should return a project tree that verifies: if file_a does not import any file, then its importingComponentIds is be empty",
             () {
           final projectTree = service?.loadProjectTree(directory);
           expect(
               getChildForPath(
                       projectTree: projectTree!,
-                      path: 'subfolder_A2/file_A2_1.dart')
+                      path: 'subfolder_a2/file_a2_1.dart')
                   .importingComponentIds,
               isEmpty);
         });
 
         test(
-            "should return a project tree that verifies: if folder_A contains a file importing another file from folder_B, then folder_B's id is contained in folder_A's importingComponentIds",
+            "should return a project tree that verifies: if folder_a contains a file importing another file from folder_b, then folder_b's id is contained in folder_a's importingComponentIds",
             () {
           final projectTree = service?.loadProjectTree(directory);
           expect(
-            getChildForPath(projectTree: projectTree!, path: 'subfolder_A1')
+            getChildForPath(projectTree: projectTree!, path: 'subfolder_a1')
                 .importingComponentIds,
             contains(
-                getChildForPath(projectTree: projectTree, path: 'subfolder_A2')
+                getChildForPath(projectTree: projectTree, path: 'subfolder_a2')
                     .id),
           );
         });
